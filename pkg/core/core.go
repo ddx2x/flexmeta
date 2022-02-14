@@ -5,11 +5,16 @@ type Metadata struct {
 	Version string `json:"version"`
 }
 
-func (m Metadata) GetKind() string           { return m.Kind }
+// Metadata Getter implement
+func (m Metadata) GetKind() string    { return m.Kind }
+func (m Metadata) GetVersion() string { return m.Version }
+
+// Metadata Setter implement
 func (m Metadata) SetVersion(version string) { m.Version = version }
 
 type Getter interface {
 	GetKind() string
+	GetVersion() string
 }
 
 type Setter interface {
@@ -22,11 +27,16 @@ type Item interface {
 }
 
 type Object[T Item] struct {
-	object T
+	item T
 }
 
-func (o *Object[T]) Clone() *T {
-	var new *T
-	new = &o.object
-	return new
+func (o *Object[T]) GetKind() string           { return o.item.GetKind() }
+func (o *Object[T]) GetVersion() string        { return o.item.GetVersion() }
+func (o *Object[T]) SetVersion(version string) { o.item.SetVersion(version) }
+
+func (o *Object[T]) Clone() *Object[T] {
+	var obj Object[T]
+	var item = &o.item
+	obj.item = *item
+	return &obj
 }

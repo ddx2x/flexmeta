@@ -11,6 +11,11 @@ type TestObject struct {
 
 func Test_Object_Clone(t *testing.T) {
 	object := &Object[TestObject]{}
+	object.item.SetVersion("123")
 	newObj := object.Clone()
-	fmt.Println(newObj)
+
+	if fmt.Sprintf("%x", object) == fmt.Sprintf("%x", newObj) ||
+		object.GetVersion() != newObj.GetVersion() {
+		t.Failed()
+	}
 }
