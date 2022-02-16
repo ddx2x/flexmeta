@@ -1,55 +1,47 @@
 package core
 
-type Default struct {
-	metadata struct {
-		Name    string `json:"name"`
-		Kind    string `json:"kind"`
-		Version string `json:"version"`
-	} `json:"metadata"`
-	spec Spec `json:"spec"`
+import "encoding/json"
+
+var _ Getter = &Metadata{}
+
+type Metadata struct {
+	UID     string `json:"uid"`
+	Version string `json:"version"`
 }
 
-// Default.Metadata getter implement
-func (d Default) getKind() string    { return d.metadata.Kind }
-func (d Default) getVersion() string { return d.metadata.Version }
-func (d Default) getSpec() Spec      { return d.spec }
+func (m Metadata) Get() Metadata { return m }
 
-// Default.Metadata setter implement
-func (d Default) setVersion(version string) { d.metadata.Version = version }
-func (d Default) setSpec(spec Spec)         { d.spec = spec }
+type Spec map[string]any
 
-type Spec = map[string]interface{}
-
-type getter interface {
-	getKind() string
-	getVersion() string
-	getSpec() Spec
+type Getter interface {
+	Get() Metadata
 }
 
-type setter interface {
-	setVersion(version string)
-	setSpec(spec Spec)
+type IObject interface {
+	~struct {
+		Metadata `json:"metadata"`
+		Spec     `json:"spec"`
+	}
+	Getter
 }
 
-type Item interface {
-	getter
-	setter
-}
-
-type Object[T Item] struct {
+type Object[T IObject] struct {
 	item T
 }
 
-func (o *Object[T]) Kind() string    { return o.item.getKind() }
-func (o *Object[T]) Version() string { return o.item.getVersion() }
-func (o *Object[T]) Spec() Spec      { return o.item.getSpec() }
+func (o *Object[T]) Set(item T)         { o.item = item }
+func (o *Object[T]) Metadata() Metadata { return o.item.Get() }
 
-func (o *Object[T]) UpdateVersion()       { o.item.setVersion("new version") }
-func (o *Object[T]) UpdateSpec(spec Spec) { o.item.setSpec(spec) }
-
-func (o *Object[T]) Clone() *Object[T] {
+func (o *Object[T]) Clone() (*Object[T], error) {
 	var obj Object[T]
-	var item = &o.item
-	obj.item = *item
-	return &obj
+	var target T
+	src, err := json.Marshal(&o.item)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(src, &target); err != nil {
+		return nil, err
+	}
+	obj.item = target
+	return &obj, nil
 }
