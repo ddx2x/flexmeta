@@ -20,6 +20,9 @@ type Object[T IObject] struct {
 	item T
 }
 
+func (o *Object[T]) Spec() Spec         { return o.item.Spec }
+func (o *Object[T]) Metadata() Metadata { return o.item.Metadata }
+
 func (o *Object[T]) Set(item T) { o.item = item }
 func (o *Object[T]) Get() T     { return o.item }
 

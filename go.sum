@@ -1,2 +1,2 @@
-github.com/jinzhu/copier v0.3.5 h1:GlvfUwHk62RokgqVNvYsku0TATCF7bAHVwEXoBh3iJg=
-github.com/jinzhu/copier v0.3.5/go.mod h1:DfbEm0FYsaqBcKcFuvmOZb218JkPGtvSHsKg8S8hyyg=
+golang.org/x/exp v0.0.0-20220215214139-058d147d01d4 h1:EtImWAMS+4vS02uOo8uq754b1XPwoHb2KSUzVINlrpI=
+golang.org/x/exp v0.0.0-20220215214139-058d147d01d4/go.mod h1:lRnflEfy7nRvpQCcpkwaSP1nkrSyjkyFNcqXKfSXLMc=

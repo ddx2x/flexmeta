@@ -1,6 +1,7 @@
 package core
 
 import (
+	"golang.org/x/exp/maps"
 	"testing"
 )
 
@@ -30,7 +31,9 @@ func Test_Object_Clone(t *testing.T) {
 	oldAction := object.Get()
 	newAction := newObj.Get()
 
-	if oldAction.UID != newAction.UID || newAction.Version != oldAction.Version {
+	if oldAction.UID != newAction.UID ||
+		newAction.Version != oldAction.Version ||
+		!maps.Equal(newAction.Spec, oldAction.Spec) {
 		t.Failed()
 	}
 }
