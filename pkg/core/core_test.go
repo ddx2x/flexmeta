@@ -36,4 +36,11 @@ func Test_Object_Clone(t *testing.T) {
 		!maps.Equal(newAction.Spec, oldAction.Spec) {
 		t.Failed()
 	}
+
+	newObj.UpdateVersion("321")
+	newAction = newObj.Get()
+	if newAction.Version != "321" {
+		t.Failed()
+	}
+	t.Logf("ok")
 }
