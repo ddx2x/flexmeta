@@ -11,19 +11,26 @@ type Action struct {
 
 func Test_Object_Clone(t *testing.T) {
 	object := &Object[Action]{}
-	action := Action{
+
+	object.Set(Action{
 		Metadata{
-			UID: "123",
+			UID:     "123",
+			Version: "123",
 		},
-		Spec{},
-	}
-	object.Set(action)
+		Spec{
+			"abc": 123,
+			"cde": 123,
+		},
+	})
+
 	newObj, err := object.Clone()
 	if err != nil {
 		t.Fatalf("%s", err)
 	}
-	newAction := newObj.Metadata()
-	if newAction.UID != action.UID {
+	oldAction := object.Get()
+	newAction := newObj.Get()
+
+	if oldAction.UID != newAction.UID || newAction.Version != oldAction.Version {
 		t.Failed()
 	}
 }
