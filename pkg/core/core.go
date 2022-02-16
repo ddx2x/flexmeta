@@ -9,15 +9,19 @@ type Metadata struct {
 
 type Spec map[string]any
 
-type IObject interface {
+type Objectable interface {
 	~struct {
 		Metadata `json:"metadata"`
 		Spec     `json:"spec"`
 	}
 }
 
-type Object[T IObject] struct {
+type Object[T Objectable] struct {
 	item T
+}
+
+func NewObject[T Objectable](item T) *Object[T] {
+	return &Object[T]{item}
 }
 
 func (o *Object[T]) Spec() Spec             { return o.item.Spec }
