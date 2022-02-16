@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func Test_Base_Service(t *testing.T) {
+func Test_Service(t *testing.T) {
 
 }

@@ -7,9 +7,14 @@ import (
 	"github.com/laik/flexmeta/pkg/store"
 )
 
+
+
 type Service[T core.Objectable, S store.IStore[string, map[string]any, T]] struct {
-	object *core.Object[T]
-	store  S
+	store S
+}
+
+func NewService[T core.Objectable, S store.IStore[string, map[string]any, T]](obj T, store S) *Service[T, S] {
+	return &Service[T, S]{store}
 }
 
 func (s *Service[T, S]) Get(ctx context.Context, name string) (*T, error) {
