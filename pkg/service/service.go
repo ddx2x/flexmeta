@@ -7,8 +7,6 @@ import (
 	"github.com/laik/flexmeta/pkg/store"
 )
 
-
-
 type Service[T core.Objectable, S store.IStore[string, map[string]any, T]] struct {
 	store S
 }
