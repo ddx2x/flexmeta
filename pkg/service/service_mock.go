@@ -2,7 +2,7 @@ package service
 
 import "github.com/laik/flexmeta/pkg/core"
 
-type MockService struct {
-	core.Metadata
-	core.Spec
+type MockServiceObject struct {
+	core.Metadata `json:"metadata"`
+	core.Spec     `json:"spec"`
 }

@@ -1,4 +1,4 @@
-package base
+package resource
 
 import (
 	"github.com/laik/flexmeta/pkg/core"
