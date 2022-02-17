@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 
-	"github.com/laik/flexmeta/pkg/api"
-	"github.com/laik/flexmeta/pkg/api/base"
-	"github.com/laik/flexmeta/pkg/signals"
+	"github.com/ddx2x/flexmeta/pkg/api"
+	"github.com/ddx2x/flexmeta/pkg/api/base"
+	"github.com/ddx2x/flexmeta/pkg/signals"
 )
 
 func main() {

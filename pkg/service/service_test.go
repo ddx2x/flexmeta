@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/laik/flexmeta/pkg/core"
-	"github.com/laik/flexmeta/pkg/store"
+	"github.com/ddx2x/flexmeta/pkg/core"
+	"github.com/ddx2x/flexmeta/pkg/store"
 )
 
 func Test_Base_Mock_Service2(t *testing.T) {

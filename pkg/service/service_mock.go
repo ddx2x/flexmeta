@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/laik/flexmeta/pkg/core"
+	"github.com/ddx2x/flexmeta/pkg/core"
 )
 
 type MockObject struct {

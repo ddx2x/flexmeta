@@ -3,12 +3,12 @@ package base
 import (
 	"context"
 
+	"github.com/ddx2x/flexmeta/pkg/api"
+	"github.com/ddx2x/flexmeta/pkg/core"
+	"github.com/ddx2x/flexmeta/pkg/service"
+	"github.com/ddx2x/flexmeta/pkg/store"
+	rc "github.com/ddx2x/flexmeta/resource"
 	"github.com/gin-gonic/gin"
-	"github.com/laik/flexmeta/pkg/api"
-	"github.com/laik/flexmeta/pkg/core"
-	"github.com/laik/flexmeta/pkg/service"
-	"github.com/laik/flexmeta/pkg/store"
-	rc "github.com/laik/flexmeta/resource"
 )
 
 type (
@@ -36,7 +36,7 @@ func (s *Server) Init(opts ...api.Options) error {
 	server.base.Set(store.NewStore[K, Q, RB](&MockBaseStore[K, Q, RB]{}, nil))
 
 	server.routes()
-	
+
 	return nil
 }
 

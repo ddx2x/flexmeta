@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/laik/flexmeta/pkg/core"
-	"github.com/laik/flexmeta/pkg/store"
+	"github.com/ddx2x/flexmeta/pkg/core"
+	"github.com/ddx2x/flexmeta/pkg/store"
 )
 
 type Serviceable[K comparable, Q ~map[K]any, E core.Objectizable, R core.Object[E]] interface {

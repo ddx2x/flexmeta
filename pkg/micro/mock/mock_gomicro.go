@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	mi "github.com/laik/flexmeta/pkg/micro"
+	mi "github.com/ddx2x/flexmeta/pkg/micro"
 	"github.com/micro/micro/v2/cmd"
 )
 

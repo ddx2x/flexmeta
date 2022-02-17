@@ -1,4 +1,4 @@
-module github.com/laik/flexmeta
+module github.com/ddx2x/flexmeta
 
 go 1.18
 
