@@ -3,33 +3,33 @@ package core
 import "encoding/json"
 
 type Metadata struct {
-	UID     string `json:"uid"`
-	Version string `json:"version"`
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
+	UID       string `json:"uid"`
+	Version   string `json:"version"`
+	Area      uint8  `json:"area"`
 }
 
 type Spec map[string]any
 
-type Objectable interface {
+func (s Spec) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s)
+}
+
+type Objectizable interface {
 	~struct {
 		Metadata `json:"metadata"`
 		Spec     `json:"spec"`
 	}
 }
 
-type Object[T Objectable] struct {
+type Object[T Objectizable] struct {
 	item T
 }
 
-func NewObject[T Objectable](item T) *Object[T] {
-	return &Object[T]{item}
-}
-
-func (o *Object[T]) Spec() Spec             { return o.item.Spec }
-func (o *Object[T]) Metadata() Metadata     { return o.item.Metadata }
-func (o *Object[T]) UpdateVersion(v string) { o.item.Metadata.Version = v }
-
 func (o *Object[T]) Set(item T) { o.item = item }
-func (o *Object[T]) Get() T     { return o.item }
+
+func (o *Object[T]) Get() T { return o.item }
 
 func (o *Object[T]) Clone() (*Object[T], error) {
 	var obj Object[T]

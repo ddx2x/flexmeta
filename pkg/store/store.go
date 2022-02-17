@@ -4,22 +4,29 @@ import (
 	"context"
 )
 
-type IStore[K comparable, Q ~map[K]any, O any] interface {
-	Create(ctx context.Context, q Q, o O) (O, error)
-	Update(ctx context.Context, q Q, old O, new O, force bool) (O, error)
-	List(ctx context.Context, q Q) ([]O, error)
-	Get(ctx context.Context, q Q) (O, error)
+// IStore interface method for internal implementation, only KV storage or rdbms storage is implemented here
+
+type IKVStore[K comparable, Q ~map[K]any, R any] interface {
+	// Create Object
+	Create(context.Context, R) error
+	//
+	Update(ctx context.Context, old R, new R, force bool) (R, error)
+	//
+	Delete(context.Context, Q) error
+	//
+	List(context.Context, Q) ([]R, error)
+	//
+	Get(context.Context, Q) (R, error)
 }
 
-type Store[K comparable, Q ~map[K]any, O any, S IStore[K, Q, O]] struct {
-	store S
+type IRDBMSStore[K comparable, Q ~map[K]any, R any] interface {
 }
 
-func NewStore[K comparable, Q ~map[K]any, O any, S IStore[K, Q, O]](s S) (*Store[K, Q, O, S], error) {
-	return &Store[K, Q, O, S]{s}, nil
+type Store[K comparable, Q ~map[K]any, R any] struct {
+	IKVStore[K, Q, R]
+	IRDBMSStore[K, Q, R]
 }
 
-func (s *Store[K, Q, O, S]) List(ctx context.Context, q Q) ([]O, error) {
-	//do something
-	return s.store.List(ctx, q)
+func NewStore[K comparable, Q ~map[K]any, R any](kv IKVStore[K, Q, R], rdbms IRDBMSStore[K, Q, R]) *Store[K, Q, R] {
+	return &Store[K, Q, R]{kv, rdbms}
 }

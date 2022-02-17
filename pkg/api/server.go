@@ -10,19 +10,33 @@ type HttpServer interface {
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
 	Run(addr ...string) error
 }
-type Server[H http.Handler] struct {
-	serv *http.Server
+
+type ApiServer interface {
+	Init(opts ...Options) error
+	Start(ctx context.Context) error
 }
 
-func NewServer[H http.Handler](handle H, addr string) (*Server[H], error) {
+type Server[H http.Handler, A ApiServer] struct {
+	serv    *http.Server
+	apiServ A
+	opts    []Options
+}
+
+func NewServer[H http.Handler, A ApiServer](h H, apiServ A, addr string) (*Server[H, A], error) {
 	srv := &http.Server{
 		Addr:    addr,
-		Handler: handle,
+		Handler: h,
 	}
-	return &Server[H]{srv}, nil
+	opts := make([]Options, 0)
+	opts = append(opts, WithAddr(addr))
+	return &Server[H, A]{serv: srv, apiServ: apiServ, opts: opts}, nil
 }
 
-func (s *Server[T]) Start(ctx context.Context) error {
+func (s *Server[T, A]) Start(ctx context.Context) error {
+	if err := s.apiServ.Init(s.opts...); err != nil {
+		return err
+	}
+
 	var errc = make(chan error)
 	go func() {
 		if err := s.serv.ListenAndServe(); err != nil {
@@ -34,5 +48,6 @@ func (s *Server[T]) Start(ctx context.Context) error {
 			errc <- errors.New("server shutdown")
 		}
 	}()
+
 	return <-errc
 }

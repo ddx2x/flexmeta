@@ -1,8 +1,9 @@
 package core
 
 import (
-	"golang.org/x/exp/maps"
 	"testing"
+
+	"golang.org/x/exp/maps"
 )
 
 type Action struct {
@@ -37,10 +38,5 @@ func Test_Object_Clone(t *testing.T) {
 		t.Failed()
 	}
 
-	newObj.UpdateVersion("321")
-	newAction = newObj.Get()
-	if newAction.Version != "321" {
-		t.Failed()
-	}
 	t.Logf("ok")
 }

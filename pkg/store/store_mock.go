@@ -7,18 +7,25 @@ import (
 
 var MockExpectListError = errors.New("MockExpectListError")
 
-type MockStore[K comparable, Q map[K]any, O any] struct{}
+type MockStore[K comparable, Q ~map[K]any, R any] struct{}
 
-func (m MockStore[K, Q, O]) Create(ctx context.Context, q Q, r O) (O, error) {
-	return r, nil
-}
-func (m MockStore[K, Q, O]) List(ctx context.Context, q Q) ([]O, error) {
-	return nil, MockExpectListError
-}
-func (m MockStore[K, Q, O]) Get(ctx context.Context, q Q) (O, error) {
-	var ret O
-	return ret, nil
-}
-func (m MockStore[K, Q, O]) Update(ctx context.Context, q Q, old O, new O, force bool) (O, error) {
+// Create Object
+func (m MockStore[K, Q, R]) Create(context.Context, R) error { return nil }
+
+//
+func (m MockStore[K, Q, R]) Update(ctx context.Context, old R, new R, force bool) (R, error) {
 	return new, nil
+}
+//
+func (m MockStore[K, Q, R]) Delete(context.Context, Q) error { return nil }
+
+//
+func (m MockStore[K, Q, R]) List(context.Context, Q) ([]R, error) { 
+	return nil, MockExpectListError 
+}
+
+//
+func (m MockStore[K, Q, R]) Get(context.Context, Q) (R, error) {
+	var r R
+	return r, nil
 }

@@ -5,34 +5,27 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/laik/flexmeta/pkg/api"
-	"github.com/laik/flexmeta/pkg/service"
-	"github.com/laik/flexmeta/pkg/store"
-	"github.com/laik/flexmeta/resource"
 )
 
 type Server struct {
-	serv   *api.Server[*gin.Engine]
-	engine *gin.Engine
-	base   *service.Service[resource.Base, store.IStore[string, map[string]any, resource.Base]]
-
-	registers []func()
+	*gin.Engine
 }
 
-func RunServer(ctx context.Context, addr string) error {
+func (s *Server) Init(opts ...api.Options) error {
 	engine := gin.Default()
-
-	apiServer, err := api.NewServer(engine, addr)
-	if err != nil {
-		return err
+	option := &api.Option{}
+	for _, f := range opts {
+		f(option)
 	}
 
+	// base := service.NewService(resource.Base{}, nil)
 	server := &Server{
-		engine:    engine,
-		serv:      apiServer,
-		registers: make([]func(), 0),
+		Engine: engine,
 	}
-
 	server.routes()
+	return nil
+}
 
-	return server.serv.Start(ctx)
+func (s *Server) Start(ctx context.Context) error {
+	return nil
 }
