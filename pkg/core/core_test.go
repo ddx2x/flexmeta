@@ -16,7 +16,7 @@ type ActionSpec struct {
 func Test_Object_Clone(t *testing.T) {
 	object := &Object[Action]{}
 
-	object.Set(&Action{
+	object.Set(Action{
 		Metadata{
 			UID:     "123",
 			Version: "123",

@@ -1,12 +1,13 @@
-package resource
+package base
 
 import (
 	"github.com/ddx2x/flexmeta/pkg/core"
 )
 
-type BaseSpec struct {
+type Spec struct {
 	UserId string `json:"userId"`
 }
+
 type Base struct {
 	core.Metadata `json:"metadata"`
 	core.Spec     `json:"spec"`

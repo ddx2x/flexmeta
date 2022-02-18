@@ -5,18 +5,20 @@ go 1.18
 require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/micro/micro/v2 v2.0.0-00010101000000-000000000000
-	golang.org/x/exp v0.0.0-20220215214139-058d147d01d4
 )
 
 require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect
 	github.com/xdg-go/stringprep v1.0.2 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
+	honnef.co/go/tools v0.1.3 // indirect
 )
 
 require (

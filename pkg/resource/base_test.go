@@ -1,4 +1,4 @@
-package resource
+package base
 
 import (
 	"testing"
@@ -9,12 +9,12 @@ import (
 func Test_Base_Object_Clone(t *testing.T) {
 	object := &core.Object[Base]{}
 
-	object.Set(&Base{
+	object.Set(Base{
 		core.Metadata{
 			UID:     "123",
 			Version: "123",
 		},
-		BaseSpec{
+		Spec{
 			UserId: "123",
 		},
 	})
@@ -23,13 +23,24 @@ func Test_Base_Object_Clone(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%s", err)
 	}
-	oldAction := object.Get()
-	newAction := newObj.Get()
+	old := object.Get()
+	new := newObj.Get()
 
-	if oldAction.UID != newAction.UID ||
-		newAction.Version != oldAction.Version {
+	if old.UID != new.UID ||
+		new.Version != old.Version {
 		t.Failed()
 	}
+
+	newObj.Spec(Spec{
+		UserId: "456",
+	})
+
+	bs, err := newObj.Marshal()
+	if err != nil {
+		t.Failed()
+	}
+
+	_ = bs
 
 	t.Logf("ok")
 }

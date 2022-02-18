@@ -5,9 +5,9 @@ import (
 
 	"github.com/ddx2x/flexmeta/pkg/api"
 	"github.com/ddx2x/flexmeta/pkg/core"
+	rc "github.com/ddx2x/flexmeta/pkg/resource"
 	"github.com/ddx2x/flexmeta/pkg/service"
 	"github.com/ddx2x/flexmeta/pkg/store"
-	rc "github.com/ddx2x/flexmeta/resource"
 	"github.com/gin-gonic/gin"
 )
 
