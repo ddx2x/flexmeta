@@ -2,8 +2,6 @@ package core
 
 import (
 	"testing"
-
-	"golang.org/x/exp/maps"
 )
 
 type Action struct {
@@ -11,17 +9,20 @@ type Action struct {
 	Spec     `json:"spec"`
 }
 
+type ActionSpec struct {
+	Id string
+}
+
 func Test_Object_Clone(t *testing.T) {
 	object := &Object[Action]{}
 
-	object.Set(Action{
+	object.Set(&Action{
 		Metadata{
 			UID:     "123",
 			Version: "123",
 		},
-		Spec{
-			"abc": 123,
-			"cde": 123,
+		ActionSpec{
+			Id: "123",
 		},
 	})
 
@@ -29,12 +30,10 @@ func Test_Object_Clone(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%s", err)
 	}
-	oldAction := object.Get()
-	newAction := newObj.Get()
+	old := object.Get()
+	new := newObj.Get()
 
-	if oldAction.UID != newAction.UID ||
-		newAction.Version != oldAction.Version ||
-		!maps.Equal(newAction.Spec, oldAction.Spec) {
+	if old.UID != new.UID || old.Version != new.Version {
 		t.Failed()
 	}
 

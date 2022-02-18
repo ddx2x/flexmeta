@@ -17,6 +17,8 @@ type IKVStore[K comparable, Q ~map[K]any, R any] interface {
 	List(context.Context, Q) ([]R, error)
 	//
 	Get(context.Context, Q) (R, error)
+	//
+	// Watch(context.Context, Q) (<-chan R,<-chan error)
 }
 
 type IRDBMSStore[K comparable, Q ~map[K]any, R any] interface {
