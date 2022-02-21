@@ -1,8 +1,6 @@
 package base
 
 import (
-	"context"
-
 	"github.com/ddx2x/flexmeta/pkg/api"
 	"github.com/ddx2x/flexmeta/pkg/core"
 	rc "github.com/ddx2x/flexmeta/pkg/resource"
@@ -23,7 +21,7 @@ type Server struct {
 	base service.Service[K, Q, B, RB]
 }
 
-func (s *Server) Init(opts ...api.Options) error {
+func (s *Server) Init(opts ...api.Options) {
 	engine := gin.Default()
 	option := &api.Option{}
 	for _, f := range opts {
@@ -36,10 +34,4 @@ func (s *Server) Init(opts ...api.Options) error {
 	server.base.Set(store.NewStore[K, Q, RB](&MockBaseStore[K, Q, RB]{}, nil))
 
 	server.routes()
-
-	return nil
-}
-
-func (s *Server) Start(ctx context.Context) error {
-	return nil
 }

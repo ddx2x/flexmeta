@@ -1,11 +1,15 @@
 package core
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type Metadata struct {
 	Name      string `json:"name"`
 	Namespace string `json:"namespace"`
 	UID       string `json:"uid"`
+	Kind      string `json:"kind"`
 	Version   string `json:"version"`
 	Area      uint8  `json:"area"`
 }
@@ -17,6 +21,32 @@ type Objectizable interface {
 		Metadata `json:"metadata"`
 		Spec     `json:"spec"`
 	}
+}
+
+type Items[T Objectizable] struct {
+	Metadata `json:"metadata"`
+	Items    []T `json:"items"`
+}
+
+func (i Items[T]) From(objects []Object[T]) Items[T] {
+	var md Metadata
+	var version string
+	var noset bool = false
+	for _, obj := range objects {
+		item := obj.Get()
+		if !noset {
+			md = Metadata{
+				Kind: fmt.Sprintf("%s%s", item.Kind, "List"),
+			}
+		}
+		if version < item.Version {
+			version = item.Version
+		}
+
+		i.Items = append(i.Items, item)
+	}
+	i.Metadata = md
+	return i
 }
 
 type Object[T Objectizable] struct {
