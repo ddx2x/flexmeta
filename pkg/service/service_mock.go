@@ -9,7 +9,7 @@ import (
 
 type MockObject struct {
 	core.Metadata `json:"metadata"`
-	core.Spec     `json:"spec"`
+	Spec          struct{} `json:"spec"`
 }
 
 var (

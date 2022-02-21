@@ -2,7 +2,6 @@ package core
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type Metadata struct {
@@ -13,64 +12,58 @@ type Metadata struct {
 	Version   string `json:"version"`
 	Area      uint8  `json:"area"`
 }
-
-type Spec any
-
 type Objectizable interface {
 	~struct {
 		Metadata `json:"metadata"`
-		Spec     `json:"spec"`
-	}
+	} | any
 }
 
-type Items[T Objectizable] struct {
+type Items[T any] struct {
 	Metadata `json:"metadata"`
-	Items    []T `json:"items"`
+	Items    []T `json:"Items"`
 }
 
 func (i Items[T]) From(objects []Object[T]) Items[T] {
-	var md Metadata
-	var version string
-	var noset bool = false
-	for _, obj := range objects {
-		item := obj.Get()
-		if !noset {
-			md = Metadata{
-				Kind: fmt.Sprintf("%s%s", item.Kind, "List"),
-			}
-		}
-		if version < item.Version {
-			version = item.Version
-		}
+	// var md Metadata
+	// var version string
+	// var noset bool = false
+	// for _, obj := range objects {
+	// 	Item := obj.Get()
+	// 	if !noset {
+	// 		md = Metadata{
+	// 			Kind: fmt.Sprintf("%s%s", Item.Kind, "List"),
+	// 		}
+	// 	}
+	// 	if version < Item.Version {
+	// 		version = Item.Version
+	// 	}
 
-		i.Items = append(i.Items, item)
-	}
-	i.Metadata = md
+	// 	i.Items = append(i.Items, Item)
+	// }
+	// i.Metadata = md
 	return i
 }
 
-type Object[T Objectizable] struct {
-	item T
+type Object[T any] struct {
+	Item T
 }
 
-func (o *Object[T]) Set(item T) { o.item = item }
+func (o *Object[T]) Set(item T) { o.Item = item }
 
-func (o *Object[T]) Spec(spec Spec) { o.item.Spec = spec }
+func (o *Object[T]) Marshal() ([]byte, error) { return json.Marshal(o.Item) }
 
-func (o *Object[T]) Marshal() ([]byte, error) { return json.Marshal(o.item) }
-
-func (o *Object[T]) Get() T { return o.item }
+func (o *Object[T]) Get() T { return o.Item }
 
 func (o *Object[T]) Clone() (*Object[T], error) {
 	var obj Object[T]
 	var target T
-	src, err := json.Marshal(&o.item)
+	src, err := json.Marshal(&o.Item)
 	if err != nil {
 		return nil, err
 	}
 	if err := json.Unmarshal(src, &target); err != nil {
 		return nil, err
 	}
-	obj.item = target
+	obj.Item = target
 	return &obj, nil
 }

@@ -6,7 +6,7 @@ import (
 
 type Action struct {
 	Metadata `json:"metadata"`
-	Spec     `json:"spec"`
+	Spec     any `json:"spec"`
 }
 
 type ActionSpec struct {

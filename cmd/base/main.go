@@ -9,18 +9,27 @@ import (
 	"github.com/ddx2x/flexmeta/pkg/signals"
 )
 
+type (
+	K string
+	Q map[K]interface{}
+	R any
+)
+
 func main() {
 	stopCh := signals.SetupSignalHandler()
 	ctx, cancel := context.WithCancel(context.Background())
+
 	go func() {
 		<-stopCh
 		cancel()
 	}()
-
-	// log.L = logadapter.FromLogrus(logrus.NewEntry(logrus.StandardLogger()))
-	// log.G(ctx).Info("start cr webserver")
-
-	if err := api.NewServer(base.NewServer(), ":8080").Start(ctx); err != nil {
+	
+	if err := api.NewServer(
+		base.NewServer(),
+		api.Addr(":8080"),
+		api.StoreAddr("mongodb://127.0.0.1:27017/admin"),
+	).
+		Start(ctx); err != nil {
 		panic(err)
 	}
 }

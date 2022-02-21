@@ -1,7 +1,8 @@
-package mongo
+package main
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"time"
 
@@ -9,15 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-)
-
-const (
-	metadata          = "metadata"
-	version           = "version"
-	metadataName      = "metadata.name"
-	metadataWorkspace = "metadata.workspace"
-	metadataUUID      = "metadata.uuid"
-	metadataDelete    = "metadata.deleted"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 func getCtx(client *mongo.Client) (context.Context, context.CancelFunc, error) {
@@ -29,40 +22,48 @@ func getCtx(client *mongo.Client) (context.Context, context.CancelFunc, error) {
 }
 
 func connect(ctx context.Context, uri string) (*mongo.Client, error) {
-	cliOpt := options.Client()
-	cliOpt.SetRegistry(
+	clientOptions := options.Client()
+	clientOptions.SetRegistry(
 		bson.NewRegistryBuilder().
 			RegisterTypeMapEntry(
 				bsontype.DateTime,
 				reflect.TypeOf(time.Time{})).
 			Build(),
 	)
-	cliOpt.ApplyURI(uri)
-	mcli, err := mongo.NewClient(cliOpt)
+	clientOptions.ApplyURI(uri)
+	client, err := mongo.NewClient(clientOptions)
 	if err != nil {
 		return nil, err
 	}
-	ctx, cancel, err := getCtx(mcli)
+	ctx, cancel, err := getCtx(client)
 	defer cancel()
 	if err != nil {
 		return nil, err
 	}
-	if err := mcli.Ping(ctx, nil); err != nil {
+	if err := client.Ping(ctx, nil); err != nil {
 		return nil, err
 	}
-	return mcli, nil
+	return client, nil
 }
 
-type query struct {
-	DB   string `json:"db"`
-	Coll string `json:"coll"`
-	Q    bson.D `json:"q"`
-}
-
-func parseQ[K comparable, Q ~map[K]any](q Q) *query {
-	return &query{
-		DB:   "base",
-		Coll: "account",
-		Q:    bson.D{},
+func main() {
+	ctx := context.Background()
+	c, err := connect(ctx, "mongodb://localhost:27017/admin")
+	if err != nil {
+		panic(err)
 	}
+	res := c.Database("base").Collection("account").FindOne(ctx, bson.D{})
+
+	_ = res
+	fmt.Println(res)
+	var a map[string]interface{}
+	res.Decode(&a)
+
+	fmt.Println(a)
+
+	err = c.Ping(ctx, readpref.Primary())
+	if err != nil {
+		panic(err)
+	}
+
 }

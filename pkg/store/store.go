@@ -5,7 +5,6 @@ import (
 )
 
 // IStore interface method for internal implementation, only KV storage or rdbms storage is implemented here
-
 type IKVStore[K comparable, Q ~map[K]any, R any] interface {
 	// Create Object
 	Create(context.Context, R) error
@@ -31,4 +30,8 @@ type Store[K comparable, Q ~map[K]any, R any] struct {
 
 func NewStore[K comparable, Q ~map[K]any, R any](kv IKVStore[K, Q, R], rdbms IRDBMSStore[K, Q, R]) *Store[K, Q, R] {
 	return &Store[K, Q, R]{kv, rdbms}
+}
+
+func Get[K comparable, Q ~map[K]any, R any](store interface{}) *Store[K, Q, R] {
+	return store.(*Store[K, Q, R])
 }

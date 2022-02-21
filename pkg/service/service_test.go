@@ -14,7 +14,6 @@ func Test_Base_Mock_Service2(t *testing.T) {
 
 	type E struct {
 		core.Metadata `json:"metadata"`
-		core.Spec     `json:"spec"`
 	}
 	type R = core.Object[E]
 

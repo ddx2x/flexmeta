@@ -13,14 +13,19 @@ func (s *Server) pong(c *gin.Context) {
 	})
 }
 
-func (s *Server) Get(g *gin.Context) {
+func (s *Server) getAccount(g *gin.Context) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	target, err := s.base.List(ctx, Q{"name": "a"})
+	targets, err := s.accont.List(ctx, Q{})
 	if err != nil {
-		g.JSON(500, err)
+		g.JSON(500, map[string]interface{}{"error": err.Error()})
+		return
+	}
+	objects := make([]core.Object[A], 0)
+	for _, target := range targets {
+		objects = append(objects, core.Object[A]{Item: target})
 	}
 
-	g.JSON(200, (&core.Items[B]{}).From(target))
+	g.JSON(200, objects)
 }

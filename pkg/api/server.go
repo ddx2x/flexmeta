@@ -8,7 +8,7 @@ import (
 
 type ApiServer interface {
 	http.Handler
-	Init(opts ...Options)
+	Init(opts ...Options) error
 }
 
 type Server struct {
@@ -17,23 +17,26 @@ type Server struct {
 	opts    []Options
 }
 
-func NewServer(h ApiServer, addr string) *Server {
-	srv := &http.Server{
-		Addr:    addr,
-		Handler: h,
+func NewServer(h ApiServer, opts ...Options) *Server {
+	opt := &Option{}
+	for _, f := range opts {
+		f(opt)
 	}
-	opts := make([]Options, 0)
-	opts = append(opts, WithAddr(addr))
+	if opt.Addr == "" {
+		opt.Addr = ":8080"
+	}
 
 	return &Server{
-		serv:    srv,
+		serv:    &http.Server{Handler: h,Addr:  opt.Addr},
 		apiServ: h,
 		opts:    opts,
 	}
 }
 
 func (s *Server) Start(ctx context.Context) error {
-	s.apiServ.Init(s.opts...)
+	if err := s.apiServ.Init(s.opts...); err != nil {
+		return err
+	}
 
 	var errc = make(chan error)
 	go func() {

@@ -10,5 +10,5 @@ type Spec struct {
 
 type Base struct {
 	core.Metadata `json:"metadata"`
-	core.Spec     `json:"spec"`
+	Spec     `json:"spec"`
 }
