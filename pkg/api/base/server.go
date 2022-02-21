@@ -13,25 +13,32 @@ type (
 	K  string
 	Q  map[K]any
 	B  rc.Base
-	RB = core.Object[B]
+	OB = core.Object[B]
 )
 
 type Server struct {
 	*gin.Engine
-	base service.Service[K, Q, B, RB]
+	opt *api.Option
+
+	base service.Service[K, Q, B, OB]
+}
+
+func NewServer() *Server {
+	return &Server{
+		Engine: gin.New(),
+		opt:    &api.Option{},
+	}
 }
 
 func (s *Server) Init(opts ...api.Options) {
-	engine := gin.Default()
 	option := &api.Option{}
 	for _, f := range opts {
 		f(option)
 	}
-	server := &Server{
-		Engine: engine,
+
+	s.base.Set(store.NewStore[K, Q, OB](&MockBaseStore[K, Q, OB]{}, nil))
+
+	{
+		s.GET("/", s.pong)
 	}
-
-	server.base.Set(store.NewStore[K, Q, RB](&MockBaseStore[K, Q, RB]{}, nil))
-
-	server.routes()
 }

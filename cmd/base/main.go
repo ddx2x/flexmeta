@@ -5,10 +5,8 @@ import (
 
 	"github.com/ddx2x/flexmeta/pkg/api"
 	"github.com/ddx2x/flexmeta/pkg/api/base"
-	"github.com/ddx2x/flexmeta/pkg/log"
-	"github.com/ddx2x/flexmeta/pkg/logrus"
+
 	"github.com/ddx2x/flexmeta/pkg/signals"
-	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -19,10 +17,10 @@ func main() {
 		cancel()
 	}()
 
-	log.L = logrus.FromLogrus(logrus.NewEntry(logrus.StandardLogger()))
-	log.G(ctx).Info("start cr webserver")
+	// log.L = logadapter.FromLogrus(logrus.NewEntry(logrus.StandardLogger()))
+	// log.G(ctx).Info("start cr webserver")
 
-	if err := api.NewServer(&base.Server{}, ":8080").Start(ctx); err != nil {
+	if err := api.NewServer(base.NewServer(), ":8080").Start(ctx); err != nil {
 		panic(err)
 	}
 }

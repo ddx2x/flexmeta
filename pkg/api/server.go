@@ -6,11 +6,6 @@ import (
 	"net/http"
 )
 
-type HttpServer interface {
-	ServeHTTP(w http.ResponseWriter, r *http.Request)
-	Run(addr ...string) error
-}
-
 type ApiServer interface {
 	http.Handler
 	Init(opts ...Options)
@@ -42,15 +37,18 @@ func (s *Server) Start(ctx context.Context) error {
 
 	var errc = make(chan error)
 	go func() {
-		if err := s.serv.ListenAndServe(); err != nil {
-			errc <- err
+		for {
+			select {
+			case <-ctx.Done():
+				s.serv.Shutdown(ctx)
+				errc <- errors.New("server shutdown")
+				return
+			default:
+				if err := s.serv.ListenAndServe(); err != nil {
+					errc <- err
+				}
+			}
 		}
-	}()
-
-	go func() {
-		<-ctx.Done()
-		s.serv.Shutdown(ctx)
-		errc <- errors.New("server shutdown")
 	}()
 
 	return <-errc

@@ -7,11 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (server *Server) routes() {
-	server.GET("/", server.Get)
-	server.GET("/ping", server.Get)
-}
-
 func (s *Server) pong(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": "pong",
