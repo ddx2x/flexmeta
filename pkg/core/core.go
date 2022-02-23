@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 )
 
-
 type Metadata struct {
 	Name      string `json:"name"`
 	Namespace string `json:"namespace"`
@@ -13,36 +12,11 @@ type Metadata struct {
 	Version   string `json:"version"`
 	Area      uint8  `json:"area"`
 }
+
 type Objectizable interface {
 	~struct {
 		Metadata `json:"metadata"`
 	} | any
-}
-
-type Items[T any] struct {
-	Metadata `json:"metadata"`
-	Items    []T `json:"Items"`
-}
-
-func (i Items[T]) From(objects []Object[T]) Items[T] {
-	// var md Metadata
-	// var version string
-	// var noset bool = false
-	// for _, obj := range objects {
-	// 	Item := obj.Get()
-	// 	if !noset {
-	// 		md = Metadata{
-	// 			Kind: fmt.Sprintf("%s%s", Item.Kind, "List"),
-	// 		}
-	// 	}
-	// 	if version < Item.Version {
-	// 		version = Item.Version
-	// 	}
-
-	// 	i.Items = append(i.Items, Item)
-	// }
-	// i.Metadata = md
-	return i
 }
 
 type Object[T any] struct {
@@ -89,4 +63,18 @@ func (o *Object[T]) Clone() (*Object[T], error) {
 	}
 	obj.Item = target
 	return &obj, nil
+}
+
+type EventType = string
+
+const (
+	ADDED    EventType = "ADDED"
+	MODIFIED EventType = "MODIFIED"
+	DELETED  EventType = "DELETED"
+	REMOVED  EventType = "REMOVED"
+)
+
+type Event struct {
+	Type   EventType `json:"type"`
+	Object any       `json:"object"`
 }
