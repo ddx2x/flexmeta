@@ -6,16 +6,15 @@ import (
 )
 
 // CompareMergeObject(src, dest,["spec.userId","spec.userName"])
-func CompareMergeObject(src, dest map[string]interface{}, paths ...string) bool {
+func CompareMergeObject(src, dest map[string]interface{}, paths ...string) {
 	for _, p := range paths {
 		srcContent := Get(src, p)
 		destContent := Get(dest, p)
 		if reflect.DeepEqual(srcContent, destContent) {
-			return false
+			return
 		}
 		Set(src, p, destContent)
 	}
-	return true
 }
 
 // Set "path":"a.b.c"

@@ -7,11 +7,6 @@ import (
 	"github.com/ddx2x/flexmeta/pkg/core"
 )
 
-type MockObject struct {
-	core.Metadata `json:"metadata"`
-	Spec          struct{} `json:"spec"`
-}
-
 var (
 	MockExpectCreateError = errors.New("MockExpectCreateError")
 	MockExpectListError   = errors.New("MockExpectListError")
@@ -19,7 +14,7 @@ var (
 	MockExpectDeleteError = errors.New("MockExpectDeleteError")
 )
 
-type MockServiceStore[K comparable, Q ~map[K]any, R any] struct{}
+type MockServiceStore[K comparable, Q ~map[K]any, R core.IObject] struct{}
 
 func (m MockServiceStore[K, Q, R]) Create(context.Context, R) error {
 	return MockExpectCreateError

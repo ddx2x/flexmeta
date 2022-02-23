@@ -1,15 +1,17 @@
 package service
 
 import (
+	"github.com/ddx2x/flexmeta/pkg/core"
 	"github.com/ddx2x/flexmeta/pkg/store"
 )
 
-type Serviceable[K comparable, Q ~map[K]any, R any] interface {
-	~struct {
-		Service[K, Q, R]
-	}
-}
-type Service[K comparable, Q ~map[K]any, R any] struct {
+// type Serviceable[K comparable, Q ~map[K]any, R core.IObject] interface {
+// 	~struct {
+// 		Service[K, Q, R]
+// 	}
+// }
+
+type Service[K comparable, Q ~map[K]any, R core.IObject] struct {
 	*store.Store[K, Q, R]
 }
 

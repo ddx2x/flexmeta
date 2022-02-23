@@ -7,17 +7,7 @@ import (
 )
 
 func Test_Base_Object_Clone(t *testing.T) {
-	object := &core.Object[Account]{}
-
-	object.Set(Account{
-		core.Metadata{
-			UID:     "123",
-			Version: "123",
-		},
-		Spec{
-			AccountType: 3,
-		},
-	})
+	object := core.NewObject(Account{Uid: "123"})
 
 	newObj, err := object.Clone()
 	if err != nil {
@@ -26,14 +16,9 @@ func Test_Base_Object_Clone(t *testing.T) {
 	old := object.Get()
 	new := newObj.Get()
 
-	if old.UID != new.UID ||
-		new.Version != old.Version {
+	if old.Uid != new.Uid {
 		t.Failed()
 	}
-
-	// newObj.Spec(Spec{
-	// 	AccountType: 4,
-	// })
 
 	bs, err := newObj.Marshal()
 	if err != nil {

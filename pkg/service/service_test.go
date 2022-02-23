@@ -8,23 +8,27 @@ import (
 	"github.com/ddx2x/flexmeta/pkg/store"
 )
 
+type E struct {
+}
+
+func (e E) Marshal() ([]byte, error) {
+	return nil, nil
+}
+
+func (e E) Unmarshal(a any) error {
+	return nil
+}
 func Test_Base_Mock_Service2(t *testing.T) {
 	type K string
 	type Q map[K]any
-
-	type E struct {
-		core.Metadata `json:"metadata"`
-	}
-
-	type R = core.Object[E]
+	type R = core.IObject
 
 	// 定义一个BaseService拓展基础的Service
 	type BaseService struct {
 		Service[K, Q, R]
 	}
 
-	// 创建一core.Object[T]的实例
-	base := core.Object[E]{}
+	base := E{}
 
 	// 初始化一个BaseService
 	baseService := &BaseService{}

@@ -10,13 +10,7 @@ func Test_Base_Object_Clone(t *testing.T) {
 	object := &core.Object[Base]{}
 
 	object.Set(Base{
-		core.Metadata{
-			UID:     "123",
-			Version: "123",
-		},
-		Spec{
-			UserId: "123",
-		},
+		Uid: "123",
 	})
 
 	newObj, err := object.Clone()
@@ -26,8 +20,7 @@ func Test_Base_Object_Clone(t *testing.T) {
 	old := object.Get()
 	new := newObj.Get()
 
-	if old.UID != new.UID ||
-		new.Version != old.Version {
+	if old.Uid != new.Uid {
 		t.Failed()
 	}
 

@@ -4,11 +4,11 @@ import (
 	"net/http"
 )
 
-type Api[S MicroService] struct {
-	svc S
+type Api struct {
+	svc MicroService
 }
 
-func (m *Api[S]) Inject(handler http.Handler) error {
+func (m *Api) Inject(handler http.Handler) error {
 	if err := m.svc.Init(); err != nil {
 		return err
 	}
@@ -16,10 +16,10 @@ func (m *Api[S]) Inject(handler http.Handler) error {
 	return nil
 }
 
-func (m *Api[S]) Start() error { return m.svc.Run() }
+func (m *Api) Start() error { return m.svc.Run() }
 
-func NewService[S MicroService](svc S) *Api[S] {
-	return &Api[S]{
+func NewService(svc MicroService) *Api {
+	return &Api{
 		svc: svc,
 	}
 }

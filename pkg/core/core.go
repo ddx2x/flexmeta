@@ -4,34 +4,30 @@ import (
 	"encoding/json"
 )
 
-type Metadata struct {
-	Name      string `json:"name"`
-	Namespace string `json:"namespace"`
-	UID       string `json:"uid"`
-	Kind      string `json:"kind"`
-	Version   string `json:"version"`
-	Area      uint8  `json:"area"`
+type IObject interface {
+	Unmarshal(a any) error
+	Marshal() ([]byte, error)
+	
+	~struct{} | any
 }
 
-type Objectizable interface {
-	~struct {
-		Metadata `json:"metadata"`
-	} | any
-}
-
-type Object[T any] struct {
+type Object[T IObject] struct {
 	Item T
+}
+
+func NewObject[T IObject](t T) *Object[T] {
+	return &Object[T]{}
 }
 
 func (o *Object[T]) Set(item T) { o.Item = item }
 
 func (o *Object[T]) Get() T { return o.Item }
 
-func (o *Object[T]) Marshal() ([]byte, error) { return json.Marshal(o.Item) }
+func (o *Object[T]) Marshal() ([]byte, error) { return o.Item.Marshal() }
 
-func (o *Object[T]) Unmarshal(b []byte) error { return json.Unmarshal(b, &o.Item) }
+func (o *Object[T]) Unmarshal(a any) error { return o.Item.Unmarshal(a) }
 
-func (o *Object[T]) From(i interface{}) error {
+func (o *Object[T]) From(i any) error {
 	b, err := json.Marshal(i)
 	if err != nil {
 		return err
@@ -39,12 +35,12 @@ func (o *Object[T]) From(i interface{}) error {
 	return o.Unmarshal(b)
 }
 
-func (o *Object[T]) ToMap() (map[string]interface{}, error) {
+func (o *Object[T]) ToMap() (map[string]any, error) {
 	bs, err := json.Marshal(&o.Item)
 	if err != nil {
 		return nil, err
 	}
-	var r map[string]interface{}
+	var r map[string]any
 	if err = json.Unmarshal(bs, r); err != nil {
 		return nil, err
 	}

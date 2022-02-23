@@ -14,7 +14,7 @@ func (m *MongoCli[K, Q, R]) Create(context.Context, R) error {
 }
 
 func (m *MongoCli[K, Q, R]) Update(ctx context.Context, old R, new R, q Q) (R, error) {
-	query := parseQ[K](q)
+	query := parseQ(q)
 	singleResult := m.cli.Database(query.DB).
 		Collection(query.Coll).
 		FindOne(ctx, query.Q)
@@ -39,19 +39,14 @@ func (m *MongoCli[K, Q, R]) Update(ctx context.Context, old R, new R, q Q) (R, e
 	if err != nil {
 		return new, err
 	}
-	
+
 	newMap, err := newObject.ToMap()
 	if err != nil {
 		return new, err
 	}
 
-	if len(query.Paths) == 0 {
-		query.Paths = []string{"spec"}
-	}
-
 	for _, path := range query.Paths {
-		if dict.CompareMergeObject(oldMap, newMap, path) {
-		}
+		dict.CompareMergeObject(oldMap, newMap, path)
 	}
 
 	if err := newObject.From(oldMap); err != nil {
@@ -78,7 +73,7 @@ func (m *MongoCli[K, Q, R]) Update(ctx context.Context, old R, new R, q Q) (R, e
 func (m *MongoCli[K, Q, R]) List(ctx context.Context, q Q) ([]R, error) {
 	var targets []R
 	fOpts := options.Find()
-	query := parseQ[K](q)
+	query := parseQ(q)
 
 	cursor, err := m.cli.Database(query.DB).
 		Collection(query.Coll).
@@ -95,7 +90,7 @@ func (m *MongoCli[K, Q, R]) List(ctx context.Context, q Q) ([]R, error) {
 
 func (m *MongoCli[K, Q, R]) Get(ctx context.Context, q Q) (R, error) {
 	var t R
-	query := parseQ[K](q)
+	query := parseQ(q)
 	singleResult := m.cli.Database(query.DB).
 		Collection(query.Coll).
 		FindOne(ctx, query)

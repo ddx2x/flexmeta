@@ -33,10 +33,6 @@ func (s *Server) pong(c *gin.Context) {
 	})
 }
 
-type watcherEvent struct {
-	core.Event
-}
-
 func (s *Server) watch(c *gin.Context) {
 	ctx, cancel := context.WithCancel(context.Background())
 	_ = ctx
@@ -53,14 +49,14 @@ func (s *Server) watch(c *gin.Context) {
 			return false
 		case <-ticker.C:
 			index++
-			we := watcherEvent{}
-			we.Type = core.ADDED
-			we.Object = &Boss{
+			e := core.Event{}
+			e.Type = core.ADDED
+			e.Object = &Boss{
 				Uid:     "123",
 				Version: fmt.Sprintf("%d", index),
 				Kind:    "boss",
 			}
-			c.SSEvent("", we)
+			c.SSEvent("", e)
 		}
 		return true
 	})

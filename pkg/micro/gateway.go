@@ -16,24 +16,24 @@ type Handler func(http.Handler) http.Handler
 
 type Intercept func(w http.ResponseWriter, r *http.Request) InterceptType
 
-type Gateway[S MicroService] struct {
-	svc S
+type Gateway struct {
+	svc MicroService
 }
 
-func NewGateway[S MicroService](svc S) *Gateway[S] {
-	return &Gateway[S]{
+func NewGateway(svc MicroService) *Gateway {
+	return &Gateway{
 		svc: svc,
 	}
 }
 
-func (g *Gateway[S]) Start() error { 
+func (g *Gateway) Start() error { 
 	if err := g.svc.Init(); err != nil {
 		return err
 	}
 	return g.svc.Run() 
 }
 
-func (g *Gateway[S]) Intercept(self http.Handler, its ...Intercept) Handler {
+func (g *Gateway) Intercept(self http.Handler, its ...Intercept) Handler {
 	return func(redirect http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			state := Redirect

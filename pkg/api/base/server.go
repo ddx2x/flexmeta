@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/ddx2x/flexmeta/pkg/api"
+	"github.com/ddx2x/flexmeta/pkg/core"
 	"github.com/ddx2x/flexmeta/pkg/resource/account"
 	"github.com/ddx2x/flexmeta/pkg/resource/base"
 	"github.com/ddx2x/flexmeta/pkg/service"
@@ -61,11 +62,11 @@ func (s *Server) Init(opts ...api.Options) error {
 	return nil
 }
 
-func initService[K comparable, Q ~map[K]any, R any]() *service.Service[K, Q, R] {
+func initService[K comparable, Q ~map[K]any, R core.IObject]() *service.Service[K, Q, R] {
 	return &service.Service[K, Q, R]{}
 }
 
-func initStore[K comparable, Q ~map[K]any, R any](ctx context.Context, addr string, s *service.Service[K, Q, R]) error {
+func initStore[K comparable, Q ~map[K]any, R core.IObject](ctx context.Context, addr string, s *service.Service[K, Q, R]) error {
 	if s == nil {
 		s = &service.Service[K, Q, R]{}
 	}

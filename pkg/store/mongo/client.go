@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ddx2x/flexmeta/pkg/core"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var cli *mongo.Client
 
-type MongoCli[K comparable, Q ~map[K]any, R any] struct {
+type MongoCli[K comparable, Q ~map[K]any, R core.IObject] struct {
 	cli *mongo.Client
 }
 
@@ -20,7 +21,7 @@ func (m *MongoCli[K, Q, R]) Close() error {
 	return m.cli.Disconnect(ctx)
 }
 
-func NewMongoCli[K comparable, Q ~map[K]any, R any](ctx context.Context, uri string) (*MongoCli[K, Q, R], error) {
+func NewMongoCli[K comparable, Q ~map[K]any, R core.IObject](ctx context.Context, uri string) (*MongoCli[K, Q, R], error) {
 	var err error
 	if cli == nil {
 		cli, err = connect(ctx, uri)
