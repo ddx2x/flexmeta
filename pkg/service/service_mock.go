@@ -25,7 +25,7 @@ func (m MockServiceStore[K, Q, R]) Create(context.Context, R) error {
 	return MockExpectCreateError
 }
 
-func (m MockServiceStore[K, Q, R]) Update(ctx context.Context, old R, new R, force bool) (R, error) {
+func (m MockServiceStore[K, Q, R]) Update(ctx context.Context, old R, new R, q Q) (R, error) {
 	return new, MockExpectUpdateError
 }
 

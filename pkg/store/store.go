@@ -2,14 +2,18 @@ package store
 
 import (
 	"context"
+	"fmt"
 )
+
+var DataNotFound = fmt.Errorf("dataNotFound")
+
 
 // IStore interface method for internal implementation, only KV storage or rdbms storage is implemented here
 type IKVStore[K comparable, Q ~map[K]any, R any] interface {
 	// Create Object
 	Create(context.Context, R) error
 	//
-	Update(ctx context.Context, old R, new R, force bool) (R, error)
+	Update(ctx context.Context, old R, new R, q Q) (R, error)
 	//
 	Delete(context.Context, Q) error
 	//

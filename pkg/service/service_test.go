@@ -15,11 +15,12 @@ func Test_Base_Mock_Service2(t *testing.T) {
 	type E struct {
 		core.Metadata `json:"metadata"`
 	}
+
 	type R = core.Object[E]
 
 	// 定义一个BaseService拓展基础的Service
 	type BaseService struct {
-		Service[K, Q, E, R]
+		Service[K, Q, R]
 	}
 
 	// 创建一core.Object[T]的实例

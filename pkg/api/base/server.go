@@ -15,16 +15,14 @@ import (
 type (
 	K string
 	Q map[K]any
-	B base.Base
-	A account.Account
 )
 
 type Server struct {
 	*gin.Engine
 	opt *api.Option
 
-	base   service.Service[K, Q, B, B]
-	accont service.Service[K, Q, A, A]
+	b *service.Service[K, Q, base.Base]
+	a *service.Service[K, Q, account.Account]
 }
 
 func NewServer() *Server {
@@ -41,28 +39,25 @@ func (s *Server) Init(opts ...api.Options) error {
 	}
 
 	ctx := context.Background()
-
 	// init base service
-	m, err := mongo.NewMongoCli[K, Q, B](ctx, option.StoreAddr)
-	if err != nil {
-		return err
-	}
-
-	s.base.Set(store.NewStore[K, Q, B](m, nil))
-
+	setKVStore(ctx, option.StoreAddr, s.b)
 	// init account service
-	m1, err := mongo.NewMongoCli[K, Q, A](ctx, option.StoreAddr)
-	if err != nil {
-		return err
-	}
-	s.accont.Set(store.NewStore[K, Q, A](m1, nil))
+	setKVStore(ctx, option.StoreAddr, s.a)
 
 	//route register
 	{
 		s.GET("/", s.pong)
-
 		s.GET("/account", s.getAccount)
 	}
 
+	return nil
+}
+
+func setKVStore[K comparable, Q ~map[K]any, R any](ctx context.Context, addr string, s *service.Service[K, Q, R]) error {
+	m, err := mongo.NewMongoCli[K, Q, R](ctx, addr)
+	if err != nil {
+		return err
+	}
+	s.Set(store.NewStore[K, Q, R](m, nil))
 	return nil
 }

@@ -2,9 +2,10 @@ package mongo
 
 import (
 	"context"
-	"fmt"
-	"reflect"
 
+	"github.com/ddx2x/flexmeta/pkg/core"
+	"github.com/ddx2x/flexmeta/pkg/dict"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -12,7 +13,65 @@ func (m *MongoCli[K, Q, R]) Create(context.Context, R) error {
 	return nil
 }
 
-func (m *MongoCli[K, Q, R]) Update(ctx context.Context, old R, new R, force bool) (R, error) {
+func (m *MongoCli[K, Q, R]) Update(ctx context.Context, old R, new R, q Q) (R, error) {
+	query := parseQ[K](q)
+	singleResult := m.cli.Database(query.DB).
+		Collection(query.Coll).
+		FindOne(ctx, query.Q)
+
+	if singleResult.Err() == mongo.ErrNoDocuments {
+		_, err := m.cli.Database(query.DB).
+			Collection(query.Coll).
+			InsertOne(ctx, new)
+		if err != nil {
+			return new, err
+		}
+		return new, nil
+	}
+
+	if err := singleResult.Decode(old); err != nil {
+		return new, err
+	}
+
+	oldObject, newObject := &core.Object[R]{Item: old}, &core.Object[R]{Item: new}
+
+	oldMap, err := oldObject.ToMap()
+	if err != nil {
+		return new, err
+	}
+	
+	newMap, err := newObject.ToMap()
+	if err != nil {
+		return new, err
+	}
+
+	if len(query.Paths) == 0 {
+		query.Paths = []string{"spec"}
+	}
+
+	for _, path := range query.Paths {
+		if dict.CompareMergeObject(oldMap, newMap, path) {
+		}
+	}
+
+	if err := newObject.From(oldMap); err != nil {
+		return old, err
+	}
+
+	upsert := true
+	_, err = m.cli.Database(query.DB).
+		Collection(query.Coll).
+		ReplaceOne(ctx,
+			query.Q,
+			new,
+			options.MergeReplaceOptions(
+				&options.ReplaceOptions{Upsert: &upsert},
+			),
+		)
+	if err != nil {
+		return new, err
+	}
+
 	return new, nil
 }
 
@@ -31,16 +90,18 @@ func (m *MongoCli[K, Q, R]) List(ctx context.Context, q Q) ([]R, error) {
 		return nil, err
 	}
 
-	for _, t := range targets {
-		fmt.Println("t---->", t)
-		fmt.Println("t name---->", reflect.TypeOf(t).Name())
-	}
-
 	return targets, nil
 }
 
 func (m *MongoCli[K, Q, R]) Get(ctx context.Context, q Q) (R, error) {
 	var t R
+	query := parseQ[K](q)
+	singleResult := m.cli.Database(query.DB).
+		Collection(query.Coll).
+		FindOne(ctx, query)
+	if err := singleResult.Decode(&t); err != nil {
+		return t, err
+	}
 	return t, nil
 }
 

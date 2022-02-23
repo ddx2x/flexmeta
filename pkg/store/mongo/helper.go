@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"time"
 
@@ -10,6 +11,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+var NotFound = fmt.Errorf("notFound")
 
 const (
 	metadata          = "metadata"
@@ -54,9 +57,10 @@ func connect(ctx context.Context, uri string) (*mongo.Client, error) {
 }
 
 type query struct {
-	DB   string `json:"db"`
-	Coll string `json:"coll"`
-	Q    bson.D `json:"q"`
+	DB    string   `json:"db"`
+	Coll  string   `json:"coll"`
+	Paths []string `json:"paths"`
+	Q     bson.D   `json:"q"`
 }
 
 func parseQ[K comparable, Q ~map[K]any](q Q) *query {
@@ -65,4 +69,23 @@ func parseQ[K comparable, Q ~map[K]any](q Q) *query {
 		Coll: "account",
 		Q:    bson.D{},
 	}
+}
+
+func versionMatchFilter(opData map[string]interface{}, resourceVersion string) bool {
+	if resourceVersion == "" {
+		return false
+	}
+	md, exist := opData[metadata]
+	if !exist {
+		return false
+	}
+	mdMap := md.(map[string]interface{})
+	version, exist := mdMap[version]
+	if !exist {
+		return false
+	}
+	if version.(string) <= resourceVersion {
+		return false
+	}
+	return true
 }
