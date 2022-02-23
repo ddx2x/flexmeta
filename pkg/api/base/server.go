@@ -40,9 +40,15 @@ func (s *Server) Init(opts ...api.Options) error {
 
 	ctx := context.Background()
 	// init base service
-	setKVStore(ctx, option.StoreAddr, s.b)
+	s.b = initService[K, Q, base.Base]()
+	if err := initStore(ctx, option.StoreAddr, s.b); err != nil {
+		return err
+	}
 	// init account service
-	setKVStore(ctx, option.StoreAddr, s.a)
+	s.a = initService[K, Q, account.Account]()
+	if err := initStore(ctx, option.StoreAddr, s.a); err != nil {
+		return err
+	}
 
 	//route register
 	{
@@ -53,7 +59,14 @@ func (s *Server) Init(opts ...api.Options) error {
 	return nil
 }
 
-func setKVStore[K comparable, Q ~map[K]any, R any](ctx context.Context, addr string, s *service.Service[K, Q, R]) error {
+func initService[K comparable, Q ~map[K]any, R any]() *service.Service[K, Q, R] {
+	return &service.Service[K, Q, R]{}
+}
+
+func initStore[K comparable, Q ~map[K]any, R any](ctx context.Context, addr string, s *service.Service[K, Q, R]) error {
+	if s == nil {
+		s = &service.Service[K, Q, R]{}
+	}
 	m, err := mongo.NewMongoCli[K, Q, R](ctx, addr)
 	if err != nil {
 		return err

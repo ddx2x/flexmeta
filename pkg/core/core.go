@@ -4,24 +4,6 @@ import (
 	"encoding/json"
 )
 
-type IObject interface {
-	~struct {
-		UID     string `json:"uid"`
-		Kind    string `json:"kind"`
-		Version string `json:"version"`
-	}
-	UpdateVersion()
-}
-
-type BObject struct {
-	UID     string `json:"uid"`
-	Kind    string `json:"kind"`
-	Version string `json:"version"`
-}
-
-type X map[any]any
-
-func (b BObject) UpdateVersion() { b.Version = "new" }
 
 type Metadata struct {
 	Name      string `json:"name"`
