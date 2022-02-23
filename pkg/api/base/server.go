@@ -53,6 +53,7 @@ func (s *Server) Init(opts ...api.Options) error {
 	//route register
 	{
 		s.GET("/", s.pong)
+		s.GET("/wel/apis/ddx2x.nip/v1/boss", s.welcome)
 		s.GET("/account", s.getAccount)
 	}
 

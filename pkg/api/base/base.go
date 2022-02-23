@@ -8,6 +8,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Boss struct {
+	Uid     string `json:"uid"`
+	Version string `json:"version"`
+	Kind    string `json:"kind"`
+}
+
+func (s *Server) welcome(c *gin.Context) {
+	c.JSON(200, []*Boss{
+		{
+			Uid:     "123",
+			Version: "321",
+			Kind:    "boss",
+		}})
+}
+
 func (s *Server) pong(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": "pong",
