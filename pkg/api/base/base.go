@@ -16,6 +16,7 @@ type Boss struct {
 	Uid     string `json:"uid"`
 	Version string `json:"version"`
 	Kind    string `json:"kind"`
+	Vin     string `json:"vin"`
 }
 
 func (s *Server) welcome(c *gin.Context) {
@@ -33,6 +34,10 @@ func (s *Server) pong(c *gin.Context) {
 	})
 }
 
+func (s *Server) _watch(ctx context.Context) <-chan error {
+	return nil
+}
+
 func (s *Server) watch(c *gin.Context) {
 	ctx, cancel := context.WithCancel(context.Background())
 	_ = ctx
@@ -41,6 +46,7 @@ func (s *Server) watch(c *gin.Context) {
 
 	l := log.G(ctx).WithFields(log.Fields{"watch": "process"})
 	l.Infof("watch process start")
+
 	c.Stream(func(w io.Writer) bool {
 		select {
 		case <-c.Writer.CloseNotify(): //client close
@@ -55,6 +61,7 @@ func (s *Server) watch(c *gin.Context) {
 				Uid:     "123",
 				Version: fmt.Sprintf("%d", index),
 				Kind:    "boss",
+				Vin:     fmt.Sprintf("粤A%d", index),
 			}
 			c.SSEvent("", e)
 		}

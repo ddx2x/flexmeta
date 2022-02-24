@@ -36,3 +36,7 @@ func (m MockServiceStore[K, Q, R]) Get(context.Context, Q) (R, error) {
 	var r R
 	return r, nil
 }
+
+func (m MockServiceStore[K, Q, R]) Watch(context.Context, Q) (<-chan core.Event, <-chan error) {
+	return nil, nil
+}

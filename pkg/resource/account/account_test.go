@@ -20,12 +20,5 @@ func Test_Base_Object_Clone(t *testing.T) {
 		t.Failed()
 	}
 
-	bs, err := newObj.Marshal()
-	if err != nil {
-		t.Failed()
-	}
-
-	_ = bs
-
 	t.Logf("ok")
 }

@@ -6,8 +6,6 @@ import (
 
 type IObject interface {
 	Unmarshal(a any) error
-	Marshal() ([]byte, error)
-	
 	~struct{} | any
 }
 
@@ -22,8 +20,6 @@ func NewObject[T IObject](t T) *Object[T] {
 func (o *Object[T]) Set(item T) { o.Item = item }
 
 func (o *Object[T]) Get() T { return o.Item }
-
-func (o *Object[T]) Marshal() ([]byte, error) { return o.Item.Marshal() }
 
 func (o *Object[T]) Unmarshal(a any) error { return o.Item.Unmarshal(a) }
 

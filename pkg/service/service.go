@@ -11,8 +11,16 @@ import (
 // 	}
 // }
 
+type Watcher interface {
+}
+
 type Service[K comparable, Q ~map[K]any, R core.IObject] struct {
 	*store.Store[K, Q, R]
+}
+
+func (s *Service[K, Q, R]) Watchs(watchers ...Watcher) error {
+
+	return nil
 }
 
 func (s *Service[K, Q, R]) Set(store *store.Store[K, Q, R]) {

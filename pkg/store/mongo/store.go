@@ -2,12 +2,17 @@ package mongo
 
 import (
 	"context"
+	"fmt"
+	"reflect"
 
 	"github.com/ddx2x/flexmeta/pkg/core"
 	"github.com/ddx2x/flexmeta/pkg/dict"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+var nilfilter = map[string]any{}
 
 func (m *MongoCli[K, Q, R]) Create(context.Context, R) error {
 	return nil
@@ -101,5 +106,122 @@ func (m *MongoCli[K, Q, R]) Get(ctx context.Context, q Q) (R, error) {
 }
 
 func (m *MongoCli[K, Q, R]) Delete(context.Context, Q) error {
+	return nil
+}
+
+func fieldMatchFilter(opData map[string]interface{}, key string, value interface{}) bool {
+	return reflect.DeepEqual(dict.Get(opData, key), value)
+}
+
+func (m *MongoCli[K, Q, R]) Watch(ctx context.Context, q Q) (<-chan core.Event, <-chan error) {
+	errC := make(chan error)
+	query := parseQ(q)
+
+	ns := fmt.Sprintf("%s.%s", query.DB, query.Coll)
+	directReadFilter := func(op *Op) bool {
+		pass := true
+		for _, filter := range query.Q {
+			if pass = fieldMatchFilter(op.Data, filter.Key, filter.Value); !pass {
+				pass = false
+				break
+			}
+		}
+		return true
+	}
+	oplogTailCtx := Start(m.cli, &Options{
+		DirectReadNs:     []string{ns},
+		ChangeStreamNs:   []string{ns},
+		MaxAwaitTime:     10,
+		DirectReadFilter: directReadFilter,
+	})
+
+	eventC := make(chan core.Event, 0)
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				close(eventC)
+				oplogTailCtx.Stop()
+				return
+			case <-oplogTailCtx.ErrC:
+				close(eventC)
+				return
+			case op, ok := <-oplogTailCtx.OpC:
+				if !ok {
+					return
+				}
+				var evtop core.EventType
+				switch {
+				case op.IsInsert():
+					evtop = core.ADDED
+					if isDelete := dict.Get(op.Data, DELETED); isDelete != nil {
+						if v, ok := isDelete.(bool); ok && v {
+							continue
+						}
+					}
+				case op.IsUpdate():
+					evtop = core.MODIFIED
+					if isDelete := dict.Get(op.Data, DELETED); isDelete != nil {
+						if v, ok := isDelete.(bool); ok && v {
+							evtop = core.DELETED
+						}
+					}
+				case op.IsDelete():
+					evtop = core.DELETED
+				}
+				var r R
+				if err := r.Unmarshal(op.Data); err != nil {
+					errC <- err
+					return
+				}
+				evt := core.Event{
+					Type:   evtop,
+					Object: r,
+				}
+				eventC <- evt
+			}
+		}
+	}()
+
+	return eventC, errC
+}
+
+func (m *MongoCli[K, Q, R]) checkExistAndCreate(ctx context.Context, db, collection string, enableIndex bool, uniqeKeys ...string) error {
+	names, err := m.cli.Database(db).
+		ListCollectionNames(ctx, nilfilter)
+	if err != nil {
+		return err
+	}
+	exist := false
+
+	for _, name := range names {
+		if name == collection {
+			exist = true
+		}
+	}
+
+	if !exist {
+		if err := m.cli.Database(db).CreateCollection(ctx, collection); err != nil {
+			return err
+		}
+	}
+
+	if enableIndex {
+		keys := bson.D{}
+		for _, k := range uniqeKeys {
+			keys = append(keys, bson.E{Key: k, Value: 1})
+		}
+		indexModel := mongo.IndexModel{
+			Keys:    keys,
+			Options: options.Index().SetUnique(true),
+		}
+		if _, err = m.cli.Database(db).
+			Collection(collection).
+			Indexes().
+			CreateOne(ctx, indexModel); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

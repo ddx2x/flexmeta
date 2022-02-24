@@ -24,16 +24,5 @@ func Test_Base_Object_Clone(t *testing.T) {
 		t.Failed()
 	}
 
-	// newObj.Spec(Spec{
-	// 	UserId: "456",
-	// })
-
-	bs, err := newObj.Marshal()
-	if err != nil {
-		t.Failed()
-	}
-
-	_ = bs
-
 	t.Logf("ok")
 }

@@ -1,4 +1,5 @@
 package base
+
 type Base struct {
 	Uid string `json:"uid" bson:"_id"`
 }

@@ -3,10 +3,11 @@ package store
 import (
 	"context"
 	"fmt"
+
+	"github.com/ddx2x/flexmeta/pkg/core"
 )
 
 var DataNotFound = fmt.Errorf("dataNotFound")
-
 
 // IStore interface method for internal implementation, only KV storage or rdbms storage is implemented here
 type IKVStore[K comparable, Q ~map[K]any, R any] interface {
@@ -21,7 +22,7 @@ type IKVStore[K comparable, Q ~map[K]any, R any] interface {
 	//
 	Get(context.Context, Q) (R, error)
 	//
-	// Watch(context.Context, Q) (<-chan R,<-chan error)
+	Watch(context.Context, Q) (<-chan core.Event, <-chan error)
 }
 
 type IRDBMSStore[K comparable, Q ~map[K]any, R any] interface {

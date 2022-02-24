@@ -3,6 +3,8 @@ package store
 import (
 	"context"
 	"errors"
+
+	"github.com/ddx2x/flexmeta/pkg/core"
 )
 
 var MockExpectListError = errors.New("MockExpectListError")
@@ -29,4 +31,8 @@ func (m MockStore[K, Q, R]) List(context.Context, Q) ([]R, error) {
 func (m MockStore[K, Q, R]) Get(context.Context, Q) (R, error) {
 	var r R
 	return r, nil
+}
+
+func (m MockStore[K, Q, R]) Watch(context.Context, Q) (<-chan core.Event, <-chan error) {
+	return nil, nil
 }

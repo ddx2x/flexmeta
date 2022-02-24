@@ -14,14 +14,7 @@ import (
 
 var NotFound = fmt.Errorf("notFound")
 
-const (
-	metadata          = "metadata"
-	version           = "version"
-	metadataName      = "metadata.name"
-	metadataWorkspace = "metadata.workspace"
-	metadataUUID      = "metadata.uuid"
-	metadataDelete    = "metadata.deleted"
-)
+const DELETED = "deleted"
 
 func getCtx(client *mongo.Client) (context.Context, context.CancelFunc, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -71,21 +64,6 @@ func parseQ[K comparable, Q ~map[K]any](q Q) *query {
 	}
 }
 
-func versionMatchFilter(opData map[string]interface{}, resourceVersion string) bool {
-	if resourceVersion == "" {
-		return false
-	}
-	md, exist := opData[metadata]
-	if !exist {
-		return false
-	}
-	mdMap := md.(map[string]interface{})
-	version, exist := mdMap[version]
-	if !exist {
-		return false
-	}
-	if version.(string) <= resourceVersion {
-		return false
-	}
-	return true
+func example() {
+	parseQ(map[string]interface{}{"DB": "base"})
 }
