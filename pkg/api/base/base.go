@@ -2,7 +2,9 @@ package base
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"math/rand"
 	"time"
 
 	"github.com/ddx2x/flexmeta/pkg/core"
@@ -39,24 +41,32 @@ func (s *Server) welcome(c *gin.Context) {
 		}})
 }
 
+func iter(i int) []struct{} {
+	return make([]struct{}, i)
+}
+
+var random = func() int { return int(rand.NewSource(time.Now().UnixNano()).Int63()) }
+
 func (s *Server) view(c *gin.Context) {
-	data := [][]int{
-		{20, 34, 10, 80},
-		{40, 35, 30, 50},
-		{31, 38, 33, 44},
-		{38, 15, 5, 42},
-	}
-	c.JSON(200, []*View{
-		{
-			Uid:     "123",
-			Version: "321",
+	views := make([]*View, 0)
+	for i := range iter(100) {
+		data := [][]int{
+			{random(), random(), random(), random()},
+			{random(), random(), random(), random()},
+			{random(), random(), random(), random()},
+			{random(), random(), random(), random()},
+		}
+		views = append(views, &View{
+			Uid:     fmt.Sprintf("%d", i),
+			Version: "1",
 			Kind:    "view",
 			Options: Options{
 				XAxis: []string{"2017-10-24", "2017-10-25", "2017-10-26", "2017-10-27"},
 				Data:  data,
 			},
-		},
-	})
+		})
+	}
+	c.JSON(200, views)
 }
 
 func (s *Server) pong(c *gin.Context) {
@@ -88,22 +98,26 @@ func (s *Server) watch(c *gin.Context) {
 			index++
 			e := core.Event{}
 			e.Type = core.ADDED
-			data := [][]int{
-				{20, 34, 10, index * 10},
-				{40, 35, 30, 50},
-				{31, 38, 33, 44},
-				{38, 15, 5, 42},
+
+			for i := range iter(100) {
+				data := [][]int{
+					{random(), random(), random(), random()},
+					{random(), random(), random(), random()},
+					{random(), random(), random(), random()},
+					{random(), random(), random(), random()},
+				}
+				view := &View{
+					Uid:     fmt.Sprintf("%d", i),
+					Version: fmt.Sprintf("%d", index),
+					Kind:    "view",
+					Options: Options{
+						XAxis: []string{"2017-10-24", "2017-10-25", "2017-10-26", "2017-10-27"},
+						Data:  data,
+					},
+				}
+				e.Object = view
+				c.SSEvent("", e)
 			}
-			e.Object = &View{
-				Uid:     "123",
-				Version: "321",
-				Kind:    "view",
-				Options: Options{
-					XAxis: []string{"2017-10-24", "2017-10-25", "2017-10-26", "2017-10-27"},
-					Data:  data,
-				},
-			}
-			c.SSEvent("", e)
 		}
 		return true
 	})
