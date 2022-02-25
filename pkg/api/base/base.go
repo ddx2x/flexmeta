@@ -2,7 +2,6 @@ package base
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"time"
 
@@ -19,6 +18,18 @@ type Boss struct {
 	Vin     string `json:"vin"`
 }
 
+type Options struct {
+	XAxis []string `json:"xAxis"`
+	YAxis []string `json:"yAxis"`
+	Data  [][]int  `json:"data"`
+}
+type View struct {
+	Uid     string `json:"uid"`
+	Version string `json:"version"`
+	Kind    string `json:"kind"`
+	Options `json:"options"`
+}
+
 func (s *Server) welcome(c *gin.Context) {
 	c.JSON(200, []*Boss{
 		{
@@ -26,6 +37,26 @@ func (s *Server) welcome(c *gin.Context) {
 			Version: "321",
 			Kind:    "boss",
 		}})
+}
+
+func (s *Server) view(c *gin.Context) {
+	data := [][]int{
+		{20, 34, 10, 80},
+		{40, 35, 30, 50},
+		{31, 38, 33, 44},
+		{38, 15, 5, 42},
+	}
+	c.JSON(200, []*View{
+		{
+			Uid:     "123",
+			Version: "321",
+			Kind:    "view",
+			Options: Options{
+				XAxis: []string{"2017-10-24", "2017-10-25", "2017-10-26", "2017-10-27"},
+				Data:  data,
+			},
+		},
+	})
 }
 
 func (s *Server) pong(c *gin.Context) {
@@ -42,7 +73,7 @@ func (s *Server) watch(c *gin.Context) {
 	ctx, cancel := context.WithCancel(context.Background())
 	_ = ctx
 	ticker := time.NewTicker(time.Second * 2)
-	index := 321
+	index := 1
 
 	l := log.G(ctx).WithFields(log.Fields{"watch": "process"})
 	l.Infof("watch process start")
@@ -57,11 +88,20 @@ func (s *Server) watch(c *gin.Context) {
 			index++
 			e := core.Event{}
 			e.Type = core.ADDED
-			e.Object = &Boss{
+			data := [][]int{
+				{20, 34, 10, index * 10},
+				{40, 35, 30, 50},
+				{31, 38, 33, 44},
+				{38, 15, 5, 42},
+			}
+			e.Object = &View{
 				Uid:     "123",
-				Version: fmt.Sprintf("%d", index),
-				Kind:    "boss",
-				Vin:     fmt.Sprintf("粤A%d", index),
+				Version: "321",
+				Kind:    "view",
+				Options: Options{
+					XAxis: []string{"2017-10-24", "2017-10-25", "2017-10-26", "2017-10-27"},
+					Data:  data,
+				},
 			}
 			c.SSEvent("", e)
 		}

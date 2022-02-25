@@ -55,6 +55,7 @@ func (s *Server) Init(opts ...api.Options) error {
 	{
 		s.GET("/", s.pong)
 		s.GET("/base/apis/ddx2x.nip/v1/boss", s.welcome)
+		s.GET("/base/apis/ddx2x.nip/v1/view", s.view)
 		s.GET("/watch", s.watch)
 		s.GET("/account", s.getAccount)
 	}
